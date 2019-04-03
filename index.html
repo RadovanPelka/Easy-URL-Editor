@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Easy URL Editor</title>
+    <link href="popup.css" rel="stylesheet" />
+    <script src="popup.js"></script>
+  </head>
+  <body>
+    <div class="divFullUrl space">URL</div>
+    <input id="originalUrl" type="text" class="input-rad space" placeholder="url...">
+    <div id="paramsSection" style="display:none" class="space">
+        <div class="divFullUrl space">URL Params</div>
+        <div id="clone" style="display:none" class="space clo">
+          <input type="text" value="param" class="inputParamKey">
+          <input type="text" value="value" class="inputParamValue">
+          <div class="deleteParam">X</div>
+        </div>
+    </div>
+    <button id="btnNewParam" class="space">Add</button>
+    <button id="btnOpenUrl">GO</button>
+  </body>
+</html>

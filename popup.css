@@ -1,0 +1,115 @@
+@import url("https://fonts.googleapis.com/css?family=PT+Sans:400,700");
+
+body {
+  margin: 10px 23px 10px 10px;
+  padding: 0;
+  width: 563px;
+  height: auto;
+  background-color: rgb(246, 246, 246);
+  font-family: "PT Sans", sans-serif;
+}
+#originalUrl {
+  width: 100%;
+  max-width: 561px;
+  min-width: 561px;
+  height: 28px;
+  background-color: #fff;
+  border: 1px solid rgb(187, 187, 187);
+}
+input {
+  font-size: .9em;
+  height: 28px;
+  padding-left: 10px;
+  background-color: #fff;
+  border: 1px solid rgb(187, 187, 187);
+}
+input:focus {
+  outline: 0;
+  background-color: rgb(238, 238, 238);
+}
+
+.input-rad {
+  border-radius: 7px;
+}
+
+.clo {
+  display: flex;
+  flex-direction: row no-wrap;
+}
+
+.inputParamKey {
+  width: 100px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+.inputParamValue {
+  width: 431px;
+  margin-left: -4px;
+  margin-right: -3px;
+}
+
+#btnNewParam {
+  font-size: 0.85em;
+  background: #FFF;
+  color: black;
+  border-radius: 7px;
+  border: 1px solid rgb(187, 187, 187);
+  float: right;
+  text-align: center;
+  width: 90px;
+  vertical-align: middle;
+  margin-right: -10px;
+}
+
+#btnOpenUrl {
+  background: rgb(66, 66, 114);
+  color: #fff;
+  border-radius: 7px;
+  border: none;
+  width: 574px;
+  height: 28px;
+}
+
+.deleteParam {
+  width: 20px;
+  float: right;
+  margin-right: -11px;
+  cursor: pointer;
+  height: 32px;
+  line-height: 32px;
+  color: #fff;
+  text-align: center;
+  vertical-align: middle;
+  background: rgb(66, 66, 114);
+  border: none;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+button {
+  display: block;
+  border-radius: 2px;
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+  -webkit-user-select: none;
+  background: -webkit-linear-gradient(#fafafa, #f4f4f4 40%, #e5e5e5);
+  border: 1px solid #aaa;
+  color: #444;
+  margin-bottom: 0;
+  min-width: 4em;
+  padding: 3px 12px;
+  margin-top: 0;
+  font-size: 1.1em;
+  cursor: pointer;
+}
+button:focus {
+  outline: 0;
+}
+.divFullUrl {
+  font-size: 1em;
+  font-weight: 600;
+  color: rgb(107, 107, 107);
+}
+
+.space {
+  margin-bottom: 5px;
+}
