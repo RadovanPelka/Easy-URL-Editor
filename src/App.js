@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, memo } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Layout, { LayoutColumn } from "@kiwicom/orbit-components/lib/Layout";
 import Stack from "@kiwicom/orbit-components/lib/Stack";
 import InputGroup from "@kiwicom/orbit-components/lib/InputGroup";
@@ -6,28 +6,19 @@ import InputField from "@kiwicom/orbit-components/lib/InputField";
 import Loading from "@kiwicom/orbit-components/lib/Loading";
 import Separator from "@kiwicom/orbit-components/lib/Separator";
 import Text from "@kiwicom/orbit-components/lib/Text";
-import OrbitTextLink from "@kiwicom/orbit-components/lib/TextLink";
 import Button from "@kiwicom/orbit-components/lib/Button";
 import styled from "styled-components";
 import uuidV4 from "uuid/v4";
 import copy from "copy-to-clipboard";
 import * as R from "ramda";
+import CONFIG from "./config";
 
+import FinalURLComponent from "./components/FinalURLComponent";
 import UrlComponent from "./components/UrlComponent";
+import Option from "./components/buttons/Option";
 
-const DEFAULT_URL = "http://localhost:3000/page?id=test&name=rado";
-
-const TextLink = styled(OrbitTextLink)`
-  color: #5f738c;
-  text-decoration: none !important;
-`;
-
-const Option = styled(Button)`
-  border: 1px solid #b9c8d6;
-  background-color: white;
-  margin-left: -4px;
-  color: #5f738c !important;
-  font-weight: 200;
+const Space = styled.div`
+  height: 15px;
 `;
 
 const newGuID = () => uuidV4().split("-")[0];
@@ -44,7 +35,7 @@ const setupParams = fullUrl => {
         return { id: newGuID(), key: decode(key), value: decode(value) };
       });
 };
-const prepareParams = (fullUrl = DEFAULT_URL) => {
+const prepareParams = (fullUrl = CONFIG.DEFAULT_URL) => {
   const urlArray = fullUrl.split("?");
 
   return {
@@ -87,36 +78,50 @@ const App = () => {
       }, 2000);
   }, [localStore.copied]);
 
-  const applyOriginalUrl = () =>
-    setLocalStore(prepareParams(localStore.url.org));
+  const applyOriginalUrl = useCallback(
+    () => setLocalStore(prepareParams(localStore.url.org)),
+    [localStore.loading]
+  );
 
-  const applyOriginalParams = () =>
-    setLocalStore(prev => ({ ...prev, params: setupParams(prev.url.org) }));
+  const applyOriginalParams = useCallback(
+    () =>
+      setLocalStore(prev => ({ ...prev, params: setupParams(prev.url.org) })),
+    [localStore.loading]
+  );
 
-  const applyOriginalPage = () =>
-    setLocalStore(prev => ({
-      ...prev,
-      url: { ...prev.url, page: prev.url.org.split("?")[0] }
-    }));
+  const applyOriginalPage = useCallback(
+    () =>
+      setLocalStore(prev => ({
+        ...prev,
+        url: { ...prev.url, page: prev.url.org.split("?")[0] }
+      })),
+    [localStore.loading]
+  );
 
-  const deleteParam = id =>
-    setLocalStore(prev => ({
-      ...prev,
-      params: prev.params.filter(param => param.id !== id)
-    }));
+  const deleteParam = useCallback(
+    id =>
+      setLocalStore(prev => ({
+        ...prev,
+        params: prev.params.filter(param => param.id !== id)
+      })),
+    [localStore.url.params, localStore.params]
+  );
 
-  const updateParam = (id, e) => {
-    const { name, value } = e.target;
-    setLocalStore(prev => ({
-      ...prev,
-      params: prev.params.map(param => {
-        if (param.id === id) param[name] = value;
-        return param;
-      })
-    }));
-  };
+  const updateParam = useCallback(
+    (id, e) => {
+      const { name, value } = e.target;
+      setLocalStore(prev => ({
+        ...prev,
+        params: prev.params.map(param => {
+          if (param.id === id) param[name] = value;
+          return param;
+        })
+      }));
+    },
+    [localStore.url.params, localStore.params]
+  );
 
-  const rebuildUrl = () => {
+  const rebuildUrl = useCallback(() => {
     const {
       url: { page },
       params
@@ -124,8 +129,8 @@ const App = () => {
 
     const finalParams = params
       .map(({ key, value }) => {
-        if (R.isEmpty(key)) return false;
-        else if (R.isEmpty(key) && R.isEmpty(value)) return false;
+        if (R.isEmpty(key) || (R.isEmpty(key) && R.isEmpty(value)))
+          return false;
         else if (!R.isEmpty(key) && R.isEmpty(value)) return encode(key);
 
         return `${encode(key)}=${encode(value)}`;
@@ -135,38 +140,41 @@ const App = () => {
     return `${page}${
       finalParams.length !== 0 ? "?" + finalParams.join("&") : ""
     }`;
-  };
+  }, [localStore.params, localStore.url.page]);
 
-  const addNewParam = () =>
-    setLocalStore(prev => ({
-      ...prev,
-      params: [...prev.params, { id: newGuID(), key: "", value: "" }]
-    }));
+  const addNewParam = useCallback(
+    () =>
+      setLocalStore(prev => ({
+        ...prev,
+        params: [...prev.params, { id: newGuID(), key: "", value: "" }]
+      })),
+    [localStore.params, localStore.url.params]
+  );
 
-  const copyValue = (id, value) => {
+  const copyValue = useCallback((id, value) => {
     setLocalStore(prev => ({ ...prev, copied: id }));
     copy(value);
-  };
+  }, []);
 
-  const focusLast = key => {
+  const focusLastInput = useCallback(key => {
     if (!key)
       setTimeout(() => {
         document.querySelector("[id=last]").focus();
       }, 10);
     return "last";
-  };
+  }, []);
 
   const navigate = () => {
     chrome.tabs.update({ url: rebuildUrl() });
     window.close();
   };
 
-  const changeUrl = e => {
+  const changeUrl = useCallback(e => {
     const { value: page } = e.target;
     setLocalStore(prev => ({ ...prev, url: { ...prev.url, page } }));
-  };
+  }, []);
 
-  const keyUp = e => e.keyCode === 13 && navigate();
+  const keyDown = e => e.keyCode === 13 && navigate();
 
   return (
     <Layout type="MMB">
@@ -175,50 +183,26 @@ const App = () => {
           <Loading />
         ) : (
           <React.Fragment>
-            <Text spaceAfter="small">Final URL</Text>
-            <Stack direction="row" spacing="none">
-              <InputField
-                size="small"
-                readOnly
-                spaceAfter="small"
-                value={rebuildUrl()}
-                placeholder="https://google.com/search?q=chrome+extension+easy+url+editor"
-              />
-              <Option
-                size="small"
-                type="secondary"
-                onClick={() => copyValue("finalUrl", rebuildUrl())}
-              >
-                {localStore.copied === "finalUrl" ? "Copied" : "Copy"}
-              </Option>
-            </Stack>
-            <Stack
-              direction="row"
-              justify="end"
-              spaceAfter="small"
-              spacing="tight"
-            >
-              <TextLink
-                size="small"
-                type="secondary"
-                onClick={applyOriginalUrl}
-              >
-                Reset URL with Params
-              </TextLink>
-            </Stack>
-            <Separator />
+            <Space />
+            <FinalURLComponent
+              applyOriginalUrl={applyOriginalUrl}
+              rebuildUrl={rebuildUrl}
+              copied={localStore.copied}
+              copyValue={copyValue}
+            />
             <UrlComponent
               page={localStore.url.page}
               onChangeUrl={changeUrl}
               copied={localStore.copied}
               applyOriginalPage={applyOriginalPage}
               copyValue={copyValue}
+              onKeyDown={keyDown}
             />
             <Separator />
             <Text spaceAfter="small">
-              Params{" "}
+              Params
               {localStore.params.length !== 0 &&
-                `(${localStore.params.length})`}
+                ` (${localStore.params.length})`}
             </Text>
             <Stack direction="column" spacing="tight">
               {localStore.params.map((param, i) => (
@@ -231,26 +215,27 @@ const App = () => {
                     <InputField
                       id={
                         localStore.params.length - 1 === i &&
-                        focusLast(param.key)
+                        focusLastInput(param.key)
                       }
                       type="text"
                       name="key"
                       value={param.key}
                       placeholder="Key"
-                      onKeyUp={keyUp}
+                      onKeyDown={keyDown}
                     />
                     <InputField
                       type="text"
                       name="value"
                       value={param.value}
                       placeholder="Value"
-                      onKeyUp={keyUp}
+                      onKeyDown={keyDown}
                     />
                   </InputGroup>
                   <Option
                     size="small"
                     type="secondary"
                     onClick={() => copyValue(param.id, param.value)}
+                    tabIndex="-1"
                   >
                     {localStore.copied === param.id ? "Copied" : "Copy"}
                   </Option>
@@ -258,6 +243,7 @@ const App = () => {
                     size="small"
                     type="secondary"
                     onClick={() => deleteParam(param.id)}
+                    tabIndex="-1"
                   >
                     X
                   </Option>
@@ -268,8 +254,9 @@ const App = () => {
                   onClick={applyOriginalParams}
                   size="small"
                   type="secondary"
+                  tabIndex="-1"
                 >
-                  Reset Params
+                  Reset Params ({localStore.params.length})
                 </Button>
                 <Button onClick={addNewParam} size="small" type="secondary">
                   ADD
