@@ -7,5 +7,5 @@ Chrome web store:
 
 # Screenshots
 
-![](https://norad.cloud/tools/easy-url-editor/easy-url-editor.png)
-![](https://norad.cloud/tools/easy-url-editor/easy-url-editor-2.png)
+![](https://raw.githubusercontent.com/RadovanPelka/Easy-URL-Editor/master/images/easy-url-editor.png)
+![](https://raw.githubusercontent.com/RadovanPelka/Easy-URL-Editor/master/images/easy-url-editor-2.png)
