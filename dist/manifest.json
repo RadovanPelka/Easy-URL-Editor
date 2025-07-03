@@ -2,11 +2,11 @@
   "name": "Easy URL Editor",
   "version": "2.1",
   "description": "This is a tool for web developers. It makes editing URL parameters for long URLs much easier.",
-  "manifest_version": 2,
+  "manifest_version": 3,
   "permissions": [
     "tabs"
   ],
-  "browser_action": {
+  "action": {
     "default_title": "Easy URL Editor",
     "default_popup": "index.html",
     "default_icon": "images/icon-128.png"
@@ -16,7 +16,7 @@
     "128": "images/icon-128.png"
   },
   "commands": {
-    "_execute_page_action": {
+    "_execute_action": {
       "suggested_key": {
         "default": "Ctrl+Shift+E"
       }

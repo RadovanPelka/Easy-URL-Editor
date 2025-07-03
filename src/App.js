@@ -63,8 +63,12 @@ const App = () => {
 
   useEffect(() => {
     try {
-      chrome.tabs.getSelected(null, function(tab) {
-        setLocalStore(prepareParams(tab.url));
+      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        if (tabs[0]) {
+          setLocalStore(prepareParams(tabs[0].url));
+        } else {
+          setLocalStore(prepareParams());
+        }
       });
     } catch (err) {
       setLocalStore(prepareParams());
